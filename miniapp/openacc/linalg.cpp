@@ -111,13 +111,6 @@ void ss_copy(Field& y, Field const& x)
         y[i] = x[i];
 }
 
-// TODO : implement the wrappers for
-// ss_fill
-// ss_axpy
-// ss_scaled_diff
-// ss_scale
-// ss_lcomb
-
 // sets x := value
 // x is a vector
 // value is a scalar
