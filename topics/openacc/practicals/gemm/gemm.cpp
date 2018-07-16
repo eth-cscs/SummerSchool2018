@@ -166,13 +166,13 @@ cublasHandle_t cublas_handle()
     return handle;
 }
 
-void cublas_init()
+void init_runtime()
 {
     cublas_handle();
 }
 
 
-void cublas_shutdown()
+void shutdown_runtime()
 {
     cublasDestroy(cublas_handle());
 }
@@ -265,8 +265,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // Initialize cuBLAS
-    cublas_init();
+    init_runtime();
 
     // Compute a reference result
     auto ref = run_benchmark(n, n, n, a, b, dgemm_naive<value_type>,
@@ -304,6 +303,6 @@ int main(int argc, char **argv)
     std::cout << "dgemm lreorder (multicore): " << time_dgemm_omp << " s\n";
     std::cout << "dgemm lreorder (gpu): " << time_dgemm_openacc << " s\n";
     std::cout << "dgemm CUBLAS: " << time_dgemm_cublas << " s\n";
-    cublas_shutdown();
+    shutdown_runtime();
     return 0;
 }
