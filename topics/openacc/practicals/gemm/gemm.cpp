@@ -146,30 +146,48 @@ typename cublas_traits<float>::gemm_type gemm_fn<float>()
 }
 
 
+cublasHandle_t cublas_handle()
+{
+    static cublasHandle_t handle = nullptr;
+
+    if (!handle) {
+        if (cublasCreate(&handle) != CUBLAS_STATUS_SUCCESS) {
+            std::cerr << "CUBLAS initialization failed\n";
+            exit(1);
+        }
+
+        // Get OpenACC default stream
+        cudaStream_t accStream = (cudaStream_t) acc_get_cuda_stream(acc_async_sync);
+
+        // Set cuBLAS stream
+        cublasSetStream(handle, accStream);
+    }
+
+    return handle;
+}
+
+void cublas_init()
+{
+    cublas_handle();
+}
+
+
+void cublas_shutdown()
+{
+    cublasDestroy(cublas_handle());
+}
+
 template<typename T>
 void dgemm_cublas(size_t M, size_t N, size_t K,
                   T alpha, const T *A, const T *B, T beta, T *C)
 {
-    // Setup cublas
-    cublasHandle_t handle;
-    if (cublasCreate(&handle) != CUBLAS_STATUS_SUCCESS) {
-        std::cerr << "CUBLAS initialization failed\n";
-        exit(1);
-    }
-
-    // Get OpenACC default stream
-    cudaStream_t accStream = (cudaStream_t) acc_get_cuda_stream(acc_async_sync);
-
-    // Set cuBLAS stream
-    cublasSetStream(handle, accStream);
-
     auto cublas_gemm = gemm_fn<T>();
 
     // TODO: Move data to the GPU
     {
         // TODO: cuBLAS wants device pointers
         {
-            if (cublas_gemm(handle, CUBLAS_OP_N, CUBLAS_OP_N,
+            if (cublas_gemm(cublas_handle(), CUBLAS_OP_N, CUBLAS_OP_N,
                             M, N, K, &alpha, B, K, A, N, &beta, C, N) !=
                 CUBLAS_STATUS_SUCCESS) {
                 std::cerr << "CUBLAS GEMM failed\n";
@@ -177,8 +195,6 @@ void dgemm_cublas(size_t M, size_t N, size_t K,
             }
         }
     }
-
-    cublasDestroy(handle);
 }
 
 
@@ -249,6 +265,8 @@ int main(int argc, char **argv)
         }
     }
 
+    // Initialize cuBLAS
+    cublas_init();
 
     // Compute a reference result
     auto ref = run_benchmark(n, n, n, a, b, dgemm_naive<value_type>,
@@ -286,5 +304,6 @@ int main(int argc, char **argv)
     std::cout << "dgemm lreorder (multicore): " << time_dgemm_omp << " s\n";
     std::cout << "dgemm lreorder (gpu): " << time_dgemm_openacc << " s\n";
     std::cout << "dgemm CUBLAS: " << time_dgemm_cublas << " s\n";
+    cublas_shutdown();
     return 0;
 }
