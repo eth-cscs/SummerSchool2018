@@ -73,10 +73,9 @@ T* malloc_managed(size_t n, T value=T()) {
 template <typename T>
 T* malloc_pinned(size_t N, T value=T()) {
     T* ptr = nullptr;
-    cudaHostAlloc((void**)&ptr, N*sizeof(T), 0);
-
+    auto status = cudaHostAlloc((void**)&ptr, N*sizeof(T), 0);
+    cuda_check_status(status);
     std::fill(ptr, ptr+N, value);
-
     return ptr;
 } 
 
