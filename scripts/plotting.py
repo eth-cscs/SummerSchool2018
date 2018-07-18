@@ -7,6 +7,13 @@
 # Date: Thu May 21 14:11:38 CEST 2015
 #
 
+# check the DISPLAY environment variable
+# if it is not defined, don't show the image
+import os
+if os.environ.get('DISPLAY') == None:
+    import matplotlib
+    matplotlib.use('Agg')
+
 import pylab as pl
 import numpy as np
 
