@@ -3,3 +3,6 @@ main
 *.bin
 *.bov
 *.png
+
+# macOS
+.DS_Store
