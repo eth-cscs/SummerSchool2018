@@ -67,7 +67,7 @@ void scaled_diff(double* y, double alpha, const double* l, const double* r, int 
 
 // computes y := alpha*x
 __global__
-void scale(double* y, double alpha, double* x, int n) {
+void scale(double* y, double alpha, const double* x, int n) {
     auto i = threadIdx.x + blockDim.x*blockIdx.x;
     if(i < n) {
         y[i] = alpha*x[i];
@@ -234,7 +234,7 @@ void ss_scaled_diff(Field& y, const double alpha, Field const& l, Field const& r
 // computes y := alpha*x
 // alpha is scalar
 // y and x are vectors
-void ss_scale(Field& y, const double alpha, Field& x)
+void ss_scale(Field& y, const double alpha, Field const& x)
 {
     const int n = y.length();
     auto grid_dim = calculate_grid_dim(block_dim, n);
@@ -246,7 +246,7 @@ void ss_scale(Field& y, const double alpha, Field& x)
 // computes linear combination of two vectors y := alpha*x + beta*z
 // alpha and beta are scalar
 // y, x and z are vectors
-void ss_lcomb(Field& y, const double alpha, Field& x, const double beta, Field const& z)
+void ss_lcomb(Field& y, const double alpha, Field const& x, const double beta, Field const& z)
 {
     const int n = y.length();
     auto grid_dim = calculate_grid_dim(block_dim, n);

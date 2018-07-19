@@ -59,12 +59,12 @@ namespace linalg
     // computes y := alpha*x
     // alpha is scalar
     // y and x are vectors on length n
-    void ss_scale(Field& y, const double alpha, Field& x);
+    void ss_scale(Field& y, const double alpha, Field const& x);
 
     // computes linear combination of two vectors y := alpha*x + beta*z
     // alpha and beta are scalar
     // y, x and z are vectors on length n
-    void ss_lcomb(Field& y, const double alpha, Field& x, const double beta,
+    void ss_lcomb(Field& y, const double alpha, Field const& x, const double beta,
             Field const& z);
 
     // copy one vector into another y := x
