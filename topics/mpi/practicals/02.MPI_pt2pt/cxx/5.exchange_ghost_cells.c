@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
         data[i]=rank;
     }
 
-    rank_bottom = -1;/* find the rank of the top neighbor */
-    rank_top = -1;/* find the rank of the bottom neighbor */
+    rank_bottom = -1;/* find the rank of the bottom neighbor */
+    rank_top = -1;/* find the rank of the top neighbor */
 
 
     //  ghost cell exchange with the neighbouring cells (cyclic) to the bottom and to the top using:
